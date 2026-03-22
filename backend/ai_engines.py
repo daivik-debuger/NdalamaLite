@@ -1,4 +1,59 @@
 import random
+import re
+
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    DDGS = None
+
+class DataGatheringAgent:
+    @staticmethod
+    def get_lusaka_price_from_web(commodity: str):
+        """Uses an AI web agent to search for current commodity prices."""
+        if not DDGS:
+            return None
+        try:
+            with DDGS() as ddgs:
+                results = list(ddgs.text(f"{commodity} price per kg in Lusaka Zambia ZMW", max_results=3))
+                if not results:
+                    return None
+                for res in results:
+                    text = res.get('body', "")
+                    # Extract ZMW amounts if possible
+                    matches = re.findall(r'(?:ZMW|K)\s*(\d+(?:\.\d+)?)', text, re.IGNORECASE)
+                    if matches:
+                        return float(matches[0])
+                    if "price" in text.lower():
+                        nums = re.findall(r'\b(\d{2,3}(?:\.\d{1,2})?)\b', text)
+                        if nums:
+                            return float(nums[0])
+            return None
+        except Exception:
+            return None
+
+class BankVerificationAgent:
+    @staticmethod
+    def verify_transaction(transaction_id: str, amount: float) -> dict:
+        """
+        Simulates an agent that goes to the bank API and checks if money was received.
+        Returns a dict with verification details.
+        """
+        is_verified = random.choice([True, True, True, False]) # 75% success rate for simulation
+        
+        if is_verified:
+            return {
+                "status": "VERIFIED",
+                "message": f"Bank confirms receipt of ZMW {amount}. Reference: {transaction_id}",
+                "timestamp": "Just now"
+            }
+        else:
+            return {
+                "status": "PENDING",
+                "message": f"Bank has not yet cleared ZMW {amount}. Please wait up to 24 hours.",
+                "timestamp": "Just now"
+            }
+
+
 
 class NdalamaMicroLending:
     @staticmethod
@@ -54,4 +109,69 @@ class CilimbaGuard:
             "trigger_payout": trigger_payout,
             "payout_amount_zm": payout_amount,
             "reason": reason
+        }
+
+class MarketAnalyzer:
+    # Base realistic price ranges per kg in ZMW 
+    PRICE_DB_PER_KG = {
+        # Staples
+        "maize": {"lusaka_price": 8.0, "transport_cost": 1.0},
+        "soya": {"lusaka_price": 16.0, "transport_cost": 1.5},
+        "groundnuts": {"lusaka_price": 18.0, "transport_cost": 1.6},
+        "sunflower": {"lusaka_price": 12.0, "transport_cost": 1.2},
+        # Fruits
+        "mangoes": {"lusaka_price": 10.0, "transport_cost": 2.0},
+        "bananas": {"lusaka_price": 15.0, "transport_cost": 3.0},
+        # Herbs
+        "mint": {"lusaka_price": 40.0, "transport_cost": 5.0},
+        "basil": {"lusaka_price": 45.0, "transport_cost": 5.0},
+        # Spices
+        "paprika": {"lusaka_price": 120.0, "transport_cost": 10.0},
+        "pepper": {"lusaka_price": 150.0, "transport_cost": 12.0},
+        # Seeds
+        "pumpkin seeds": {"lusaka_price": 50.0, "transport_cost": 4.0},
+        "chia seeds": {"lusaka_price": 80.0, "transport_cost": 6.0}
+    }
+
+    @classmethod
+    def is_valid_commodity(cls, commodity: str) -> bool:
+        return commodity.lower().strip() in cls.PRICE_DB_PER_KG
+
+    @classmethod
+    def get_market_data(cls, commodity: str, quantity_kg: float = 50.0) -> dict:
+        """
+        Simulates real-time commodity data analysis.
+        Provides Lusaka price and a recommended floor price based on quantity.
+        """
+        commodity_key = commodity.lower().strip()
+        data = cls.PRICE_DB_PER_KG.get(commodity_key)
+        
+        # Agent goes to gather info on the web
+        web_price = DataGatheringAgent.get_lusaka_price_from_web(commodity)
+        
+        if web_price is not None:
+            base_lusaka_price = web_price
+            base_transport_cost = 2.0 # Default fallback transport cost
+            source = "AI Web Search Agent"
+        elif data:
+            base_lusaka_price = data["lusaka_price"]
+            base_transport_cost = data["transport_cost"]
+            source = "Offline DB Analyst"
+        else:
+            # Random fallback per kg if commodity not in DB
+            base_lusaka_price = random.randint(5, 50)
+            base_transport_cost = random.randint(1, 10)
+            source = "Offline DB Analyst (Estimated)"
+            
+        lusaka_price = base_lusaka_price * quantity_kg
+        transport_cost = base_transport_cost * quantity_kg
+        floor_price = lusaka_price - transport_cost
+        
+        return {
+            "commodity": commodity.capitalize(),
+            "quantity_kg": quantity_kg,
+            "lusaka_price": round(lusaka_price, 2),
+            "transport_cost": round(transport_cost, 2),
+            "recommended_floor_price": round(floor_price, 2),
+            "data_source": source
         }

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Dict, Any
-from ai_engines import NdalamaMicroLending, CilimbaGuard
+import random
+from ai_engines import NdalamaMicroLending, CilimbaGuard, MarketAnalyzer, BankVerificationAgent
 
 # In-memory session store for simulation
 # Structure: { phone_number: { "state": "MAIN_MENU", "data": {} } }
@@ -33,6 +34,10 @@ def handle_input(state: str, text: str, session: dict, phone_number: str) -> str
             return "CILIMBA_GUARD_START"
         elif text == "3":
             return "ACCOUNT_INFO"
+        elif text == "4":
+            return "MARKET_MENU"
+        elif text == "5":
+            return "BANK_VERIFY_MENU"
         else:
             return "MAIN_MENU"
             
@@ -87,6 +92,44 @@ def handle_input(state: str, text: str, session: dict, phone_number: str) -> str
         else:
             return "CILIMBA_GUARD_START"
             
+    elif state == "MARKET_MENU":
+        if not MarketAnalyzer.is_valid_commodity(text):
+            return "MARKET_NOT_FOUND"
+        session["data"]["market_commodity"] = text
+        return "MARKET_QUANTITY_INPUT"
+        
+    elif state == "MARKET_QUANTITY_INPUT":
+        try:
+            qty = float(text)
+            if qty > 100:
+                return "MARKET_QUANTITY_TOO_HIGH"
+            if qty <= 0:
+                raise ValueError
+        except ValueError:
+            return "MARKET_QUANTITY_INPUT" # Ask again or default
+            
+        commodity = session["data"]["market_commodity"]
+        market_data = MarketAnalyzer.get_market_data(commodity, quantity_kg=qty)
+        session["data"]["market_data"] = market_data
+        return "MARKET_RESULT"
+
+
+    elif state == "MARKET_RESULT":
+        data = session["data"]["market_data"]
+        return "MAIN_MENU" # This isn't actually used this way, it just continues if they type 0.
+        
+    elif state == "BANK_VERIFY_MENU":
+        if text != "0":
+            amount = random.randint(50, 500)
+            result = BankVerificationAgent.verify_transaction(f"TXN-{random.randint(1000,9999)}", amount)
+            session["data"]["bank_result"] = result
+            return "BANK_VERIFY_RESULT"
+        return "MAIN_MENU"
+        
+    elif state == "BANK_VERIFY_RESULT":
+        return "MAIN_MENU"
+
+            
     # Default fallback
     return "MAIN_MENU"
 
@@ -97,6 +140,8 @@ def get_menu_text(state: str, session: dict) -> str:
             "1. Get a Loan\n"
             "2. Savings Group Health\n"
             "3. My Account\n"
+            "4. Market Prices\n"
+            "5. Bank Verification Agent\n"
         )
     elif state == "ACCOUNT_INFO":
         eval_result = session["data"].get("loan_eval")
@@ -201,5 +246,50 @@ def get_menu_text(state: str, session: dict) -> str:
                 "Group is resilient.\n"
                 "0. Main Menu"
             )
+    elif state == "MARKET_MENU":
+        return (
+            "Market Data AI\n"
+            "Enter item (e.g., Maize, Mint, Paprika):\n"
+            "0. Back"
+        )
+    elif state == "MARKET_NOT_FOUND":
+        return (
+            "Item not found. Try typing it again (e.g., Maize, Mint):\n"
+            "0. Back"
+        )
+    elif state == "MARKET_QUANTITY_INPUT":
+        return (
+            "Enter quantity in kg (Max 100):\n"
+            "0. Back"
+        )
+    elif state == "MARKET_QUANTITY_TOO_HIGH":
+        return (
+            "Maximum capacity is 100kg.\n"
+            "Please enter a smaller amount:\n"
+            "0. Back"
+        )
+    elif state == "MARKET_RESULT":
+        data = session["data"]["market_data"]
+        return (
+            f"[{data.get('data_source', 'Agent')}]\n"
+            f"Fair Price: {data['commodity']} ({data['quantity_kg']}kg)\n"
+            f"Lusaka: ZMW {data['lusaka_price']}\n"
+            f"Transport Adjust: -ZMW {data['transport_cost']}\n"
+            f"Do not accept less than ZMW {data['recommended_floor_price']} today.\n"
+            "0. Main Menu"
+        )
+    elif state == "BANK_VERIFY_MENU":
+        return (
+            "Agent Bank Verification\n"
+            "Enter any key to ask agent to verify latest transaction:\n"
+            "0. Back"
+        )
+    elif state == "BANK_VERIFY_RESULT":
+        res = session["data"]["bank_result"]
+        return (
+            f"Agent Bank Status: {res['status']}\n"
+            f"{res['message']}\n"
+            "0. Main Menu"
+        )
     else:
         return "Invalid menu state.\n0. Back"
