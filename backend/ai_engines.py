@@ -52,6 +52,22 @@ class BankVerificationAgent:
                 "message": f"Bank has not yet cleared ZMW {amount}. Please wait up to 24 hours.",
                 "timestamp": "Just now"
             }
+            
+    @staticmethod
+    def get_recent_transactions(pin: str) -> list:
+        """
+        Simulates retrieving recent transactions after PIN verification.
+        """
+        types = ["DEPOSIT", "WITHDRAWAL", "PAYMENT"]
+        txns = []
+        for _ in range(3):
+            txns.append({
+                "type": random.choice(types),
+                "amount": random.randint(50, 1000),
+                "date": f"Mar {random.randint(10,22)}",
+                "status": "COMPLETED"
+            })
+        return txns
 
 
 

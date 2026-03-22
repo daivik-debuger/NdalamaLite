@@ -119,14 +119,16 @@ def handle_input(state: str, text: str, session: dict, phone_number: str) -> str
         return "MAIN_MENU" # This isn't actually used this way, it just continues if they type 0.
         
     elif state == "BANK_VERIFY_MENU":
-        if text != "0":
-            amount = random.randint(50, 500)
-            result = BankVerificationAgent.verify_transaction(f"TXN-{random.randint(1000,9999)}", amount)
-            session["data"]["bank_result"] = result
-            return "BANK_VERIFY_RESULT"
-        return "MAIN_MENU"
+        if text == "0":
+            return "MAIN_MENU"
+        elif len(text) >= 4 and text.isdigit():
+            txns = BankVerificationAgent.get_recent_transactions(text)
+            session["data"]["recent_txns"] = txns
+            return "BANK_RECENT_TRANSACTIONS"
+        else:
+            return "BANK_VERIFY_MENU" # Invalid PIN, stay here
         
-    elif state == "BANK_VERIFY_RESULT":
+    elif state == "BANK_RECENT_TRANSACTIONS":
         return "MAIN_MENU"
 
             
@@ -281,15 +283,15 @@ def get_menu_text(state: str, session: dict) -> str:
     elif state == "BANK_VERIFY_MENU":
         return (
             "Agent Bank Verification\n"
-            "Enter any key to ask agent to verify latest transaction:\n"
+            "Please enter your 4-digit PIN:\n"
             "0. Back"
         )
-    elif state == "BANK_VERIFY_RESULT":
-        res = session["data"]["bank_result"]
-        return (
-            f"Agent Bank Status: {res['status']}\n"
-            f"{res['message']}\n"
-            "0. Main Menu"
-        )
+    elif state == "BANK_RECENT_TRANSACTIONS":
+        txns = session["data"]["recent_txns"]
+        output = "Recent Transactions:\n"
+        for i, t in enumerate(txns):
+            output += f"{i+1}. {t['date']} {t['type']} ZMW {t['amount']}\n"
+        output += "0. Main Menu"
+        return output
     else:
         return "Invalid menu state.\n0. Back"
