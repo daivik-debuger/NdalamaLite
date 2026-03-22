@@ -1,6 +1,6 @@
 body, html {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #000000;
+    color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -10,6 +10,36 @@ body, html {
     overscroll-behavior-y: none;
     -webkit-user-select: none;
     user-select: none;
+}
+
+/* iOS 26 Liquid Glass Background Animations */
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    z-index: -1;
+    animation: float 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.orb-1 {
+    width: 350px; height: 350px;
+    background: #ff2a5f;
+    top: -10%; left: -10%;
+}
+.orb-2 {
+    width: 450px; height: 450px;
+    background: #00c6ff;
+    bottom: -15%; right: -15%;
+    animation-delay: -5s;
+}
+.orb-3 {
+    width: 300px; height: 300px;
+    background: #8a2be2;
+    top: 35%; left: 20%;
+    animation-delay: -10s;
+}
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(80px, 80px) scale(1.15); }
 }
 
 .dialer-app {
@@ -55,32 +85,37 @@ body, html {
 }
 
 .dial-key {
-    background: #e5e5ea;
-    border: none;
+    background: rgba(255, 255, 255, 0.08); /* Liquid Glass */
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     width: 75px;
     height: 75px;
     font-size: 36px;
     font-weight: 300;
-    color: #000;
+    color: #fff;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: background 0.1s;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     -webkit-tap-highlight-color: transparent;
 }
 
 .dial-key:active {
-    background: #d1d1d6;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .dial-key span {
     font-size: 11px;
     font-weight: normal;
     letter-spacing: 2px;
-    color: #000;
+    color: rgba(255, 255, 255, 0.6);
     margin-top: -5px;
 }
 
@@ -98,8 +133,11 @@ body, html {
 }
 
 .call-button {
-    background: #34c759;
-    border: none;
+    background: rgba(52, 199, 89, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(52, 199, 89, 0.4);
     border-radius: 50%;
     width: 75px;
     height: 75px;
@@ -108,10 +146,12 @@ body, html {
     align-items: center;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
 }
 
 .call-button:active {
-    background: #2cb04d;
+    background: rgba(44, 176, 77, 0.9);
+    transform: scale(0.95);
 }
 
 .delete-button {
@@ -139,10 +179,10 @@ body, html {
     left: 0;
     width: 100%;
     height: calc(83px + env(safe-area-inset-bottom));
-    background: rgba(249, 249, 249, 0.94);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    background: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(35px) saturate(200%);
+    -webkit-backdrop-filter: blur(35px) saturate(200%);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
     display: flex;
     justify-content: space-around;
     padding-bottom: env(safe-area-inset-bottom);
@@ -180,7 +220,8 @@ body, html {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
     z-index: 20;
     display: flex;
     justify-content: center;
@@ -188,41 +229,50 @@ body, html {
 }
 
 .ussd-modal {
-    background: rgba(245, 245, 245, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 14px;
-    width: 270px;
+    background: rgba(30, 30, 30, 0.65);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+    width: 290px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    margin-top: -100px; /* Slight offset up to mimic iOS */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    margin-top: -100px;
 }
 
 .ussd-text {
-    padding: 20px;
+    padding: 24px 20px 20px;
     font-size: 16px;
     text-align: center;
     white-space: pre-wrap;
-    line-height: 1.3;
-    color: #000;
+    line-height: 1.4;
+    color: #fff;
+    font-weight: 400;
 }
 
 .ussd-input {
     margin: 0 15px 15px;
-    padding: 8px 10px;
-    border: 1px solid #c8c8cc;
-    background: #fff;
-    border-radius: 6px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
     font-size: 16px;
     outline: none;
     font-family: inherit;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.ussd-input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .ussd-actions {
     display: flex;
-    border-top: 1px solid rgba(60,60,67,0.29);
+    border-top: 1px solid rgba(255,255,255,0.15);
 }
 
 .ussd-btn {
@@ -231,18 +281,19 @@ body, html {
     border: none;
     padding: 15px 0;
     font-size: 17px;
-    color: #007aff;
+    color: #0a84ff;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
 }
 
 .ussd-btn:active {
-    background: rgba(0,0,0,0.05);
+    background: rgba(255,255,255,0.1);
 }
 
 .ussd-btn.reply {
     font-weight: 600;
-    border-left: 1px solid rgba(60,60,67,0.29);
+    border-left: 1px solid rgba(255,255,255,0.15);
 }
 
 /* iOS Notification Banner */
@@ -253,16 +304,17 @@ body, html {
     transform: translateX(-50%);
     width: 90%;
     max-width: 400px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
+    background: rgba(40, 40, 40, 0.75);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 28px;
     padding: 15px;
     display: flex;
     align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
     z-index: 50;
-    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: top 0.6s cubic-bezier(0.2, 1, 0.3, 1.2);
 }
 
 .ios-banner.show {
@@ -270,8 +322,9 @@ body, html {
 }
 
 .banner-icon {
-    font-size: 30px;
+    font-size: 32px;
     margin-right: 15px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 .banner-content {
@@ -280,12 +333,13 @@ body, html {
 
 .banner-title {
     font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 3px;
-    color: #000;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #fff;
 }
 
 .banner-message {
     font-size: 14px;
-    color: #333;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.3;
 }
