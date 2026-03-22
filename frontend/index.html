@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Phone</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- iOS Notification Banner -->
+    <div class="ios-banner" id="ios-banner">
+        <div class="banner-icon">🤖</div>
+        <div class="banner-content">
+            <div class="banner-title">NdalamaLite Demo</div>
+            <div class="banner-message">Dial 888 and press Call to start the AI USSD simulation.</div>
+        </div>
+    </div>
+
+    <div class="dialer-app" id="dialer-app">
+        <div class="number-display" id="number-display"></div>
+        <div class="add-number" id="add-number">Add Number</div>
+        
+        <div class="dialpad">
+            <button class="dial-key" onclick="pressKey('1')">1<br><span>&nbsp;</span></button>
+            <button class="dial-key" onclick="pressKey('2')">2<br><span>A B C</span></button>
+            <button class="dial-key" onclick="pressKey('3')">3<br><span>D E F</span></button>
+            <button class="dial-key" onclick="pressKey('4')">4<br><span>G H I</span></button>
+            <button class="dial-key" onclick="pressKey('5')">5<br><span>J K L</span></button>
+            <button class="dial-key" onclick="pressKey('6')">6<br><span>M N O</span></button>
+            <button class="dial-key" onclick="pressKey('7')">7<br><span>P Q R S</span></button>
+            <button class="dial-key" onclick="pressKey('8')">8<br><span>T U V</span></button>
+            <button class="dial-key" onclick="pressKey('9')">9<br><span>W X Y Z</span></button>
+            <button class="dial-key" onclick="pressKey('*')">*<br><span>&nbsp;</span></button>
+            <button class="dial-key" onclick="pressKey('0')">0<br><span>+</span></button>
+            <button class="dial-key" onclick="pressKey('#')">#<br><span>&nbsp;</span></button>
+        </div>
+        
+        <div class="call-actions">
+            <button class="call-button" onclick="makeCall()">
+                <svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            </button>
+            <button class="delete-button" id="delete-btn" onclick="deleteKey()">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2zm-2.8 11.2l-1.4 1.4-2.8-2.8-2.8 2.8-1.4-1.4 2.8-2.8-2.8-2.8 1.4-1.4 2.8 2.8 2.8-2.8 1.4 1.4-2.8 2.8 2.8 2.8z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- iOS Bottom Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            <span>Favorites</span>
+        </div>
+        <div class="tab">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            <span>Recents</span>
+        </div>
+        <div class="tab">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path fill="currentColor" d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"/></svg>
+            <span>Contacts</span>
+        </div>
+        <div class="tab active">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+            <span>Keypad</span>
+        </div>
+        <div class="tab">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.5 6C15.46 6 13 8.46 13 11.5c0 1.33.47 2.55 1.26 3.5H9.74c.79-.95 1.26-2.17 1.26-3.5C11 8.46 8.54 6 5.5 6 2.46 6 0 8.46 0 11.5S2.46 17 5.5 17h13c3.04 0 5.5-2.46 5.5-5.5S21.54 6 18.5 6zm-13 9C3.57 15 2 13.43 2 11.5S3.57 8 5.5 8 9 9.57 9 11.5 7.43 15 5.5 15zm13 0c-1.93 0-3.5-1.57-3.5-3.5S16.57 8 18.5 8 22 9.57 22 11.5 20.43 15 18.5 15z"/></svg>
+            <span>Voicemail</span>
+        </div>
+    </div>
+
+    <!-- iOS USSD Modal Overlay -->
+    <div class="ussd-overlay" id="ussd-overlay" style="display: none;">
+        <div class="ussd-modal">
+            <div class="ussd-text" id="ussd-text">Please wait...</div>
+            <input type="text" id="ussd-input" class="ussd-input" autocomplete="off" autofocus>
+            <div class="ussd-actions">
+                <button class="ussd-btn cancel" onclick="cancelUSSD()">Cancel</button>
+                <button class="ussd-btn reply" onclick="replyUSSD()">Reply</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

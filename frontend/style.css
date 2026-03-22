@@ -1,0 +1,291 @@
+body, html {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior-y: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.dialer-app {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: max(40px, env(safe-area-inset-top));
+    padding-bottom: calc(83px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+}
+
+.number-display {
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 44px;
+    font-weight: 300;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    min-height: 50px;
+}
+
+.add-number {
+    text-align: center;
+    color: #007aff;
+    font-size: 16px;
+    font-weight: 400;
+    height: 20px;
+    visibility: hidden;
+    margin-bottom: auto;
+    cursor: pointer;
+}
+
+.dialpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 25px;
+    margin: 0 auto;
+    width: max-content;
+}
+
+.dial-key {
+    background: #e5e5ea;
+    border: none;
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    font-size: 36px;
+    font-weight: 300;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dial-key:active {
+    background: #d1d1d6;
+}
+
+.dial-key span {
+    font-size: 11px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    color: #000;
+    margin-top: -5px;
+}
+
+.call-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    position: relative;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 280px;
+}
+
+.call-button {
+    background: #34c759;
+    border: none;
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.call-button:active {
+    background: #2cb04d;
+}
+
+.delete-button {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #c7c7cc;
+    cursor: pointer;
+    visibility: hidden;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-button:active {
+    color: #a1a1a6;
+}
+
+/* iOS Bottom Tab Bar */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(83px + env(safe-area-inset-bottom));
+    background: rgba(249, 249, 249, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+.tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5px;
+    color: #999999;
+    font-size: 10px;
+    font-weight: 500;
+    width: 60px;
+    cursor: pointer;
+}
+
+.tab svg {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 3px;
+}
+
+.tab.active {
+    color: #007aff;
+}
+
+/* iOS USSD Modal Overlay */
+.ussd-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ussd-modal {
+    background: rgba(245, 245, 245, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    width: 270px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-top: -100px; /* Slight offset up to mimic iOS */
+}
+
+.ussd-text {
+    padding: 20px;
+    font-size: 16px;
+    text-align: center;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    color: #000;
+}
+
+.ussd-input {
+    margin: 0 15px 15px;
+    padding: 8px 10px;
+    border: 1px solid #c8c8cc;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    font-family: inherit;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.ussd-actions {
+    display: flex;
+    border-top: 1px solid rgba(60,60,67,0.29);
+}
+
+.ussd-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 15px 0;
+    font-size: 17px;
+    color: #007aff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ussd-btn:active {
+    background: rgba(0,0,0,0.05);
+}
+
+.ussd-btn.reply {
+    font-weight: 600;
+    border-left: 1px solid rgba(60,60,67,0.29);
+}
+
+/* iOS Notification Banner */
+.ios-banner {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 50;
+    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ios-banner.show {
+    top: max(45px, env(safe-area-inset-top));
+}
+
+.banner-icon {
+    font-size: 30px;
+    margin-right: 15px;
+}
+
+.banner-content {
+    flex: 1;
+}
+
+.banner-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 3px;
+    color: #000;
+}
+
+.banner-message {
+    font-size: 14px;
+    color: #333;
+}
