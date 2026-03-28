@@ -40,7 +40,7 @@ async def ussd_callback(request: USSDRequest):
         notification = parts[1].strip()
     
     # Return response formatted for USSD (CON = continue, END = end session)
-    if "0. Back" in response_text or "0. Main Menu" in response_text or "1." in response_text:
+    if any(keyword in response_text for keyword in ["0. Back", "0. Main Menu", "0. Cancel", "1."]):
         res = {"response": f"CON {response_text}"}
     else:
         res = {"response": f"END {response_text}"}

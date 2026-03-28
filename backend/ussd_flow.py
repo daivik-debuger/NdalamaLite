@@ -74,8 +74,8 @@ def handle_input(state: str, text: str, session: dict, phone_number: str) -> str
         eval_result = session["data"].get("loan_eval", {})
         debt = eval_result.get("current_debt_zm", 0)
         try:
-            amount = int(text)
-            if 0 < amount <= debt:
+            amount = float(text)
+            if amount > 0:
                 session["data"]["repaid_amount"] = amount
                 return "LOAN_REPAID"
         except ValueError:
@@ -122,15 +122,33 @@ def handle_input(state: str, text: str, session: dict, phone_number: str) -> str
         if text == "0":
             return "MAIN_MENU"
         elif len(text) >= 4 and text.isdigit():
-            txns = BankVerificationAgent.get_recent_transactions(text)
-            session["data"]["recent_txns"] = txns
-            return "BANK_RECENT_TRANSACTIONS"
+            return "BANK_ACTION_MENU"
         else:
             return "BANK_VERIFY_MENU" # Invalid PIN, stay here
+
+    elif state == "BANK_ACTION_MENU":
+        if text == "1":
+            txns = BankVerificationAgent.get_recent_transactions("1234")
+            session["data"]["recent_txns"] = txns
+            return "BANK_RECENT_TRANSACTIONS"
+        elif text == "2":
+            return "BANK_VERIFY_AMOUNT"
+        
+    elif state == "BANK_VERIFY_AMOUNT":
+        if text == "0": return "MAIN_MENU"
+        try:
+            amt = float(text)
+            res = BankVerificationAgent.verify_transaction("TXN", amt)
+            session["data"]["verify_res"] = res
+            return "BANK_VERIFY_RESULT"
+        except ValueError:
+            return "BANK_VERIFY_AMOUNT"
+
+    elif state == "BANK_VERIFY_RESULT":
+        return "MAIN_MENU"
         
     elif state == "BANK_RECENT_TRANSACTIONS":
         return "MAIN_MENU"
-
             
     # Default fallback
     return "MAIN_MENU"
@@ -149,15 +167,33 @@ def get_menu_text(state: str, session: dict) -> str:
         eval_result = session["data"].get("loan_eval")
         if eval_result:
             score = session["data"].get("updated_score", eval_result["score"])
+            debt = eval_result.get("current_debt_zm", 0)
         else:
-            # Generate a mock baseline if they haven't applied yet
             score = 50
+            debt = 0
             
+        # Simulated account data based on phone number
+        balance = random.randint(120, 980)
+        # Store balance so it stays consistent in session
+        if "account_balance" not in session["data"]:
+            session["data"]["account_balance"] = balance
+        else:
+            balance = session["data"]["account_balance"]
+        
+        debt_line = f"Outstanding Loan: ZMW {debt}\n" if debt > 0 else "Outstanding Loan: None\n"
+        
         return (
-            "My Account\n"
-            f"AI Credit Score: {score}\n"
-            "Airtime usage: Normal\n"
-            "Utility pmts: Consistent\n"
+            "━━ My Account ━━\n"
+            "Name: Mwila Tembo\n"
+            "Phone: +260 97 000 0000\n"
+            "Network: Airtel Zambia\n"
+            f"Wallet Balance: ZMW {balance}\n"
+            "━━━━━━━━━━━━━━━━\n"
+            f"AI Credit Score: {score}/99\n"
+            f"{debt_line}"
+            "Airtime Usage: Normal\n"
+            "Utility Payments: Consistent\n"
+            "Savings Group: GRP-ZAM-001\n"
             "0. Back"
         )
     elif state == "MICRO_LENDING_START":
@@ -215,13 +251,15 @@ def get_menu_text(state: str, session: dict) -> str:
         if remaining > 0:
             return f"Thank you! A partial payment of ZMW {amt} was applied. Remaining balance: ZMW {remaining}.\nYour AI Credit Score improved to {new_score}.\n[NOTIFY] Payment Processed! ZMW {amt} paid. New AI Score: {new_score}."
         else:
-            return f"Thank you! Your debt of ZMW {amt} has been repaid in full.\nYour AI Credit Score improved significantly to {new_score}!\n[NOTIFY] Debt Cleared! ZMW {amt} paid. New AI Score: {new_score}."
+            overpay = abs(remaining)
+            extra_msg = f" (ZMW {overpay} saved to your wallet)" if overpay > 0 else ""
+            return f"Thank you! Your debt has been repaid in full{extra_msg}.\nYour AI Credit Score improved significantly to {new_score}!\n[NOTIFY] Debt Cleared! ZMW {amt} paid. New AI Score: {new_score}."
 
     elif state == "PARTIAL_REPAYMENT_INPUT":
         eval_result = session["data"].get("loan_eval", {})
         debt = eval_result.get("current_debt_zm", 0)
         return (
-            f"Enter amount to repay (Max ZMW {debt}):\n"
+            f"Enter amount to repay (Current debt: ZMW {debt}):\n"
             "0. Cancel"
         )
     elif state == "CILIMBA_GUARD_START":
@@ -286,6 +324,26 @@ def get_menu_text(state: str, session: dict) -> str:
             "Please enter your 4-digit PIN:\n"
             "0. Back"
         )
+    elif state == "BANK_ACTION_MENU":
+        return (
+            "Ndalama Anti-Fraud Shield\n"
+            "Protect yourself from Fake SMS Scams.\n"
+            "1. My Recent Transactions\n"
+            "2. Verify Customer's Payment\n"
+            "0. Main Menu"
+        )
+    elif state == "BANK_VERIFY_AMOUNT":
+        return (
+            "Did a customer show you an SMS receipt?\n"
+            "Enter the deposit amount they claim (e.g. 800):\n"
+            "0. Cancel"
+        )
+    elif state == "BANK_VERIFY_RESULT":
+        res = session["data"]["verify_res"]
+        if res["status"] == "VERIFIED":
+            return f"VERIFIED: {res['message']}\n0. Main Menu"
+        else:
+            return f"{res['message']}\n0. Main Menu\n[NOTIFY] 🚨 SCAM ALERT DETECTED"
     elif state == "BANK_RECENT_TRANSACTIONS":
         txns = session["data"]["recent_txns"]
         output = "Recent Transactions:\n"

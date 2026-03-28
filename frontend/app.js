@@ -13,11 +13,17 @@ window.addEventListener('load', () => {
     showPushNotification("🤖 NdalamaLite Demo", "Dial 888 and press Call to start the AI USSD simulation.");
 });
 
-function showPushNotification(title, message) {
+function showPushNotification(title, message, isScam = false) {
     const banner = document.getElementById('ios-banner');
-    document.querySelector('.banner-icon').innerText = title.includes("🤖") ? "🤖" : "💬";
+    document.querySelector('.banner-icon').innerText = title.includes("🤖") ? "🤖" : (isScam ? "🚨" : "💬");
     document.querySelector('.banner-title').innerText = title;
     document.querySelector('.banner-message').innerText = message;
+    
+    if (isScam) {
+        banner.classList.add('scam-alert');
+    } else {
+        banner.classList.remove('scam-alert');
+    }
     
     banner.classList.add('show');
     // Hide after 6 seconds
@@ -94,8 +100,27 @@ async function sendUSSDRequest(payloadText) {
         const data = await response.json();
         const ussdCommand = data.response;
         
+        let isScam = false;
+        if ((data.notification && data.notification.includes("🚨")) || ussdCommand.includes("🚨") || ussdCommand.includes("WARNING")) {
+            isScam = true;
+            document.body.classList.add('scam-alert');
+            
+            // Text to speech for illiterate users - WOW factor
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let utteranceText = ussdCommand.replace(/CON |END |🚨|\[|\]/g, "");
+                if (data.notification) utteranceText = data.notification.replace(/🚨/g, "") + ". " + utteranceText;
+                let utterance = new SpeechSynthesisUtterance("Ndalama Anti-Fraud Alert. " + utteranceText);
+                utterance.rate = 0.85; // Slower presentation voice
+                window.speechSynthesis.speak(utterance);
+            }
+        } else {
+            document.body.classList.remove('scam-alert');
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
         if (data.notification) {
-            showPushNotification("Mobile Money", data.notification);
+            showPushNotification("Ndalama AI Shield", data.notification, isScam);
         }
         
         if (ussdCommand.startsWith("CON ")) {
@@ -131,6 +156,8 @@ function cancelUSSD() {
     ussdOverlay.style.display = "none";
     isSessionActive = false;
     currentInput = "";
+    document.body.classList.remove('scam-alert');
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     updateDisplay();
 }
 

@@ -38,18 +38,19 @@ class BankVerificationAgent:
         Simulates an agent that goes to the bank API and checks if money was received.
         Returns a dict with verification details.
         """
-        is_verified = random.choice([True, True, True, False]) # 75% success rate for simulation
+        # Demo predictive logic: Anything >= 500 triggers the Fraud Shield
+        is_verified = amount < 500
         
         if is_verified:
             return {
                 "status": "VERIFIED",
-                "message": f"Bank confirms receipt of ZMW {amount}. Reference: {transaction_id}",
+                "message": f"✅ SAFE: The bank confirms ZMW {amount} is securely in your account. The customer's SMS is REAL. You may release the goods.",
                 "timestamp": "Just now"
             }
         else:
             return {
-                "status": "PENDING",
-                "message": f"Bank has not yet cleared ZMW {amount}. Please wait up to 24 hours.",
+                "status": "UNVERIFIED",
+                "message": f"🚨 SCAM PREVENTED: The bank has NO record of ZMW {amount}. The customer's SMS receipt is FAKE. Do NOT hand over your goods!",
                 "timestamp": "Just now"
             }
             
